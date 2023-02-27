@@ -1,14 +1,57 @@
 from tkinter import *
 from tkinter import messagebox
 from PIL import ImageTk
+import pymysql
 
-def check_cfm():
+def clear():
+    emailEntry.delete(0,END)
+    userEntry.delete(0,END)
+    passwordEntry.delete(0,END)
+    confirmEntry.delete(0,END)
+    check.set(0)
+
+def connect_database():
     if userEntry.get()=='' or passwordEntry.get()==''or confirmEntry.get()=='' or emailEntry.get()=='' :
         messagebox.showerror('Error','All Fields Are Required')
     elif passwordEntry.get() != confirmEntry.get():
         messagebox.showerror('Error','Password Mismatch')
     elif check.get()==0:
         messagebox.showerror('Error','Please accept Terms & Condtions')
+    else:
+        try:
+            con = pymysql.connect(host = "localhost" ,user = "root" ,password = "bunnapon122")
+            mycursor = con.cursor()
+        except:
+            messagebox.showerror('Error','Database Connectivity Issue, Please Try Again')
+            return
+        
+        try:
+            query = 'create database userdata'
+            mycursor.execute(query)
+            query = 'use userdata'
+            mycursor.execute(query)
+            query = 'Create table data(id int auto_increment key not null ,email varchar(50) ,username varchar(100) ,password varchar(20))'
+            mycursor.execute(query)
+            
+        except:
+            mycursor.execute('use userdata')
+
+        query = 'select * from data where username = %s'
+        mycursor.execute(query,(userEntry.get()))
+
+        row = mycursor.fetchone()
+        if row !=None:
+            messagebox.showerror('Error','Username Already exists')
+
+        else:
+            query = 'insert into data(email,username,password) values(%s,%s,%s)'
+            mycursor.execute(query,(emailEntry.get(),userEntry.get(),passwordEntry.get()))
+            con.commit()
+            con.close()
+            messagebox.showinfo('Success','Registration is successful')
+            clear()
+            signup_window.destroy()
+            import Signin
     
 
 def login_page():
@@ -64,7 +107,7 @@ termsandconditions = Checkbutton(frames,text='I agree to the Terms & Conditions'
 termsandconditions.grid(row=9,column=0,pady=10)
 
 # Button
-signupButton = Button(frames,text='SignUp',font=('Bebas Neue',15),bd=0,fg='white',bg='gray1',width=40,command=check_cfm)
+signupButton = Button(frames,text='SignUp',font=('Bebas Neue',15),bd=0,fg='white',bg='gray1',width=40,command=connect_database)
 signupButton.grid(row=10,column=0)
 
 # alreadyaccount

@@ -1,9 +1,11 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import ImageTk
 
-def menu_page():
-    login_window.destroy()
-    import Menu_Cal
+def login_user():
+    if usernameEntry.get()=='' or passwordEntry.get()== '':
+        messagebox.showerror('Error','All Fields Are Required')
+    print('Hello')
 
 def signup_page():
     login_window.destroy()
@@ -60,7 +62,7 @@ eyeButton = Button(login_window,image=openeye,bd=0,bg='white',activebackground='
 eyeButton.place(x=850,y=335)
 
 loginButton = Button(login_window,text='Login' , font=('Bebas',20,'bold'),fg='white',bg='gray1',activeforeground='white',activebackground='gray1'
-                        ,cursor='hand2',bd=0,width=22,command=menu_page)
+                        ,cursor='hand2',bd=0,width=22,command=login_user)
 loginButton.place(x=570,y=400)
 
 signupLabel = Label(login_window,text="Don't have an account?",font=('Bebas',20),bg='white',fg='gray1')
